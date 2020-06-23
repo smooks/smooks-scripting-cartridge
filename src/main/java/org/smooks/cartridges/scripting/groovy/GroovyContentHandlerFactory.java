@@ -182,7 +182,7 @@ public class GroovyContentHandlerFactory implements ContentHandlerFactory {
 
     @Initialize
     public void initialize() throws IOException {
-        String templateText = StreamUtils.readStreamAsString(getClass().getResourceAsStream("/ScriptedGroovy.ftl"));
+        String templateText = StreamUtils.readStreamAsString(getClass().getResourceAsStream("/ScriptedGroovy.ftl"), "UTF-8");
         classTemplate = new FreeMarkerTemplate(templateText);
     }
 
