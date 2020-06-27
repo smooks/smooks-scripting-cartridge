@@ -68,9 +68,8 @@ public class GroovyContentHandlerFactoryTest {
         @Test
 	public void test_goodscript_by_Inlining() throws InstantiationException, IllegalArgumentException, IOException, SAXException {
 		String script = new String(StreamUtils.readStream(getClass().getResourceAsStream("MyGroovyScript.groovy")));
-		SmooksResourceConfiguration config = new SmooksResourceConfiguration("x", null);
+		SmooksResourceConfiguration config = new SmooksResourceConfiguration("x", script);
 		
-		config.setParameter("resdata", script);
 		test_goodscript(config);
 	}
 	
