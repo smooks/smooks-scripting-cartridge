@@ -50,7 +50,7 @@
 
     <g:groovy executeOnElement="c">
         <g:script>
-            element = DomUtils.renameElement(element, config.getStringParameter("newElementName"), true, true);
+            element = DomUtils.renameElement(element, config.getParameterValue("newElementName", String.class), true, true);
             element.setAttribute("newElementAttribute", "1234");
         </g:script>
         <param name="newElementName">newElX</param>
