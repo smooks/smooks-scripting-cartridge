@@ -110,11 +110,11 @@ class ${visitorName} implements DOMVisitAfter, SAXVisitBefore, SAXVisitAfter {
 	public void setConfiguration(SmooksResourceConfiguration config) {
 		this.config = config;
 
-		if(config.getBoolParameter("createDOMFragment", true)) {
+		if(config.getParameterValue("createDOMFragment", Boolean.class, true)) {
 		    modelCreator = new DomModelCreator();
 		}
-		format = config.getBoolParameter("format", false);
-		isWritingFragment = config.getBoolParameter("writeFragment", false);
+		format = config.getParameterValue("format", Boolean.class, false);
+		isWritingFragment = config.getParameterValue("writeFragment", Boolean.class, false);
 	}
 
     public void visitAfter(Element element, ExecutionContext executionContext) {

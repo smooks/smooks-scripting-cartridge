@@ -40,20 +40,20 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * =========================LICENSE_END==================================
  */
-package org.smooks.cartridges.scripting.groovy;
+package org.smooks.cartridges.scripting.groovy
 
-import org.smooks.cdr.SmooksResourceConfiguration;
-import org.smooks.container.ExecutionContext;
-import org.smooks.delivery.dom.DOMElementVisitor;
-import org.smooks.xml.DomUtils;
-import org.w3c.dom.Element;
+import org.smooks.cdr.SmooksResourceConfiguration
+import org.smooks.container.ExecutionContext
+import org.smooks.delivery.dom.DOMElementVisitor
+import org.smooks.xml.DomUtils
+import org.w3c.dom.Element
 
 public class MyGroovyScript implements DOMElementVisitor {
 
 	String newName;
 	
 	public void setConfiguration(SmooksResourceConfiguration config) {
-		newName = config.getStringParameter("new-name", "zzz");
+		newName = config.getParameterValue("new-name", String.class, "zzz");
 	}
 
 	public void visitBefore(Element fragment, ExecutionContext context) {

@@ -44,24 +44,27 @@ package org.smooks.cartridges.scripting.groovy;
 
 import groovy.lang.GroovyClassLoader;
 import org.codehaus.groovy.control.CompilationFailedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.smooks.cdr.SmooksConfigurationException;
 import org.smooks.cdr.SmooksResourceConfiguration;
-import org.smooks.cdr.annotation.Configurator;
+import org.smooks.cdr.injector.Scope;
+import org.smooks.cdr.lifecycle.LifecycleManager;
+import org.smooks.cdr.lifecycle.phase.PostConstructLifecyclePhase;
+import org.smooks.cdr.registry.Registry;
 import org.smooks.delivery.ContentHandler;
 import org.smooks.delivery.ContentHandlerFactory;
 import org.smooks.delivery.DomModelCreator;
 import org.smooks.delivery.Visitor;
-import org.smooks.delivery.annotation.Initialize;
-import org.smooks.delivery.annotation.Resource;
 import org.smooks.delivery.sax.SAXElement;
 import org.smooks.io.StreamUtils;
 import org.smooks.javabean.context.BeanContext;
 import org.smooks.util.FreeMarkerTemplate;
 import org.smooks.xml.DomUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.HashMap;
@@ -172,7 +175,6 @@ import java.util.Map;
  *
  * @author <a href="mailto:tom.fennelly@gmail.com">tom.fennelly@gmail.com</a>
  */
-@Resource(type="groovy")
 public class GroovyContentHandlerFactory implements ContentHandlerFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GroovyContentHandlerFactory.class);
@@ -180,20 +182,25 @@ public class GroovyContentHandlerFactory implements ContentHandlerFactory {
     private FreeMarkerTemplate classTemplate;
     private volatile int classGenCount = 1;
 
-    @Initialize
+    @Inject
+    private LifecycleManager lifecycleManager;
+
+    @Inject
+    private Registry registry;
+
+    @PostConstruct
     public void initialize() throws IOException {
         String templateText = StreamUtils.readStreamAsString(getClass().getResourceAsStream("/ScriptedGroovy.ftl"), "UTF-8");
         classTemplate = new FreeMarkerTemplate(templateText);
     }
 
     /* (non-Javadoc)
-	 * @see org.smooks.delivery.ContentHandlerFactory#create(org.smooks.cdr.SmooksResourceConfiguration)
-	 */
-	public ContentHandler create(SmooksResourceConfiguration configuration) throws SmooksConfigurationException
-  {
+     * @see org.smooks.delivery.ContentHandlerFactory#create(org.smooks.cdr.SmooksResourceConfiguration)
+     */
+    public ContentHandler create(SmooksResourceConfiguration configuration) throws SmooksConfigurationException {
 
         try {
-			byte[] groovyScriptBytes = configuration.getBytes();
+            byte[] groovyScriptBytes = configuration.getBytes();
             String groovyScript = new String(groovyScriptBytes, "UTF-8");
 
             Object groovyObject;
@@ -202,45 +209,51 @@ public class GroovyContentHandlerFactory implements ContentHandlerFactory {
             try {
                 Class groovyClass = groovyClassLoader.parseClass(groovyScript);
                 groovyObject = groovyClass.newInstance();
-            } catch(CompilationFailedException e) {
+            } catch (CompilationFailedException e) {
                 LOGGER.debug("Failed to create Visitor class instance directly from script:\n==========================\n" + groovyScript + "\n==========================\n Will try applying Visitor template to script.", e);
                 groovyObject = null;
             }
 
-            if(!(groovyObject instanceof Visitor)) {
+            if (!(groovyObject instanceof Visitor)) {
                 groovyObject = createFromTemplate(groovyScript, configuration);
             }
 
             ContentHandler groovyResource = (ContentHandler) groovyObject;
-            Configurator.configure(groovyResource, configuration);
+
+            lifecycleManager.applyPhase(groovyResource, new PostConstructLifecyclePhase(new Scope(registry, configuration, groovyResource)));
 
             return groovyResource;
         } catch (Exception e) {
-			throw new SmooksConfigurationException("Error constructing class from Groovy script " + configuration.getResource(), e);
+            throw new SmooksConfigurationException("Error constructing class from Groovy script " + configuration.getResource(), e);
         }
+    }
+
+    @Override
+    public String getType() {
+        return "groovy";
     }
 
     private Object createFromTemplate(String groovyScript, SmooksResourceConfiguration configuration) throws InstantiationException, IllegalAccessException {
         GroovyClassLoader groovyClassLoader = new GroovyClassLoader(getClass().getClassLoader());
         Map<String, Object> templateVars = new HashMap<String, Object>();
-        String imports = configuration.getStringParameter("imports", "");
+        String imports = configuration.getParameterValue("imports", String.class, "");
 
         templateVars.put("imports", cleanImportsConfig(imports));
         templateVars.put("visitorName", createClassName());
         templateVars.put("elementName", getElementName(configuration));
-        templateVars.put("visitBefore", configuration.getBoolParameter("executeBefore", false));
+        templateVars.put("visitBefore", Boolean.parseBoolean(configuration.getParameterValue("executeBefore", String.class, "false")));
         templateVars.put("visitorScript", groovyScript);
 
         String templatedClass = classTemplate.apply(templateVars);
 
-        if(groovyScript.contains("writeFragment")) {
+        if (groovyScript.contains("writeFragment")) {
             configuration.setParameter("writeFragment", "true");
         }
 
         try {
             Class groovyClass = groovyClassLoader.parseClass(templatedClass);
             return groovyClass.newInstance();
-        } catch(CompilationFailedException e) {
+        } catch (CompilationFailedException e) {
             throw new SmooksConfigurationException("Failed to compile Groovy scripted Visitor class:\n==========================\n" + templatedClass + "\n==========================\n", e);
         }
     }
@@ -271,7 +284,7 @@ public class GroovyContentHandlerFactory implements ContentHandlerFactory {
         String elementName = configuration.getTargetElement();
 
         for (int i = 0; i < elementName.length(); i++) {
-            if(!Character.isLetterOrDigit(elementName.charAt(i))) {
+            if (!Character.isLetterOrDigit(elementName.charAt(i))) {
                 return elementName + "_Mangled";
             }
         }
