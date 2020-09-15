@@ -67,6 +67,7 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -201,7 +202,7 @@ public class GroovyContentHandlerFactory implements ContentHandlerFactory {
 
         try {
             byte[] groovyScriptBytes = configuration.getBytes();
-            String groovyScript = new String(groovyScriptBytes, "UTF-8");
+            String groovyScript = new String(groovyScriptBytes, StandardCharsets.UTF_8);
 
             Object groovyObject;
 
@@ -235,7 +236,7 @@ public class GroovyContentHandlerFactory implements ContentHandlerFactory {
 
     private Object createFromTemplate(String groovyScript, SmooksResourceConfiguration configuration) throws InstantiationException, IllegalAccessException {
         GroovyClassLoader groovyClassLoader = new GroovyClassLoader(getClass().getClassLoader());
-        Map<String, Object> templateVars = new HashMap<String, Object>();
+        Map<String, Object> templateVars = new HashMap<>();
         String imports = configuration.getParameterValue("imports", String.class, "");
 
         templateVars.put("imports", cleanImportsConfig(imports));
@@ -281,7 +282,7 @@ public class GroovyContentHandlerFactory implements ContentHandlerFactory {
     }
 
     private String getElementName(SmooksResourceConfiguration configuration) {
-        String elementName = configuration.getTargetElement();
+        String elementName = configuration.getSelectorPath().getTargetElement();
 
         for (int i = 0; i < elementName.length(); i++) {
             if (!Character.isLetterOrDigit(elementName.charAt(i))) {
