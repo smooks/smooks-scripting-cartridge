@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema targetNamespace="https://www.smooks.org/xsd/smooks/groovy-1.2.xsd"
+<xs:schema targetNamespace="https://www.smooks.org/xsd/smooks/groovy-2.0.xsd"
            elementFormDefault="qualified"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns:smooks="https://www.smooks.org/xsd/smooks-1.2.xsd"
-           xmlns:smooks-groovy="https://www.smooks.org/xsd/smooks/groovy-1.2.xsd">
+           xmlns:smooks="https://www.smooks.org/xsd/smooks-2.0.xsd"
+           xmlns:groovy="https://www.smooks.org/xsd/smooks/groovy-2.0.xsd">
 
-    <xs:import namespace="https://www.smooks.org/xsd/smooks-1.2.xsd"/>
+    <xs:import namespace="https://www.smooks.org/xsd/smooks-2.0.xsd"/>
 
     <xs:annotation>
         <xs:documentation xml:lang="en">Groovy Scripting Configuration</xs:documentation>
     </xs:annotation>
 
-    <xs:element name="groovy" type="smooks-groovy:groovy" substitutionGroup="smooks:abstract-resource-config">
+    <xs:element name="groovy" type="groovy:groovy" substitutionGroup="smooks:abstract-resource-config">
         <xs:annotation>
             <xs:documentation xml:lang="en">
                 Groovy Script.
@@ -36,13 +36,6 @@
                     <xs:annotation>
                         <xs:documentation xml:lang="en">
                             The name of the element on which to execute the script.
-                        </xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute name="executeOnElementNS" type="xs:anyURI" use="optional">
-                    <xs:annotation>
-                        <xs:documentation xml:lang="en">
-                            The namespace of the element on which to execute the script.
                         </xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
