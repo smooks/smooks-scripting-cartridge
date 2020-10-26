@@ -65,6 +65,7 @@
             addCar('HSV Maloo', 'Holden', '2006', 'Australia', 'speed', 'Production Pickup Truck with speed of 271kph')
             addCar('P50', 'Peel', '1962', 'Isle of Man', 'size', 'Smallest Street-Legal Car at 99cm wide and 59 kg in weight')
             addCar('Royale', 'Bugatti', '1931', 'France', 'price', 'Most Valuable Car at $15 million')
+            writeFragment(element);
             -->
         </g:script>
     </g:groovy>

@@ -48,6 +48,7 @@
         <resource type="groovy">
             element = DomUtils.renameElement(element, "xxx", true, true);
             element.setAttribute("newElementAttribute", "1234");
+            writeFragment(element);
         </resource>
     </resource-config>
 

@@ -44,14 +44,10 @@
 
 <smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd" xmlns:g="https://www.smooks.org/xsd/smooks/groovy-2.0.xsd">
 
-    <params>
-        <param name="stream.filter.type">SAX</param>
-    </params>
-
     <g:groovy executeOnElement="c" executeBefore="true">
         <g:script>
             <!--
-            element.getWriter(this).write('<xxx newElementAttribute="1234"></xxx>');
+            executionContext.getWriter().write('<xxx newElementAttribute="1234"></xxx>');
             -->
         </g:script>
     </g:groovy>

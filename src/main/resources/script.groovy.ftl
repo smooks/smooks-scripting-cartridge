@@ -40,7 +40,7 @@
  Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  =========================LICENSE_END==================================
 -->
-package org.smooks.scripting.groovy;
+package org.smooks.cartridges.scripting.groovy;
 
 import groovy.xml.XmlUtil;
 import groovy.xml.dom.DOMCategory;
@@ -53,15 +53,12 @@ import org.smooks.javabean.context.BeanContext;
 
 import org.smooks.delivery.DomModelCreator;
 import org.smooks.delivery.DOMModel;
-import org.smooks.delivery.dom.DOMVisitBefore;
-import org.smooks.delivery.dom.DOMVisitAfter;
 import org.smooks.delivery.dom.serialize.Serializer;
 import org.smooks.xml.*;
 import org.smooks.io.NullWriter;
 
-import org.smooks.delivery.sax.SAXVisitBefore;
-import org.smooks.delivery.sax.SAXVisitAfter;
-import org.smooks.delivery.sax.SAXElement;
+import org.smooks.delivery.sax.ng.BeforeVisitor;
+import org.smooks.delivery.sax.ng.AfterVisitor;
 
 import java.io.IOException;
 import org.w3c.dom.*;
@@ -70,7 +67,7 @@ import java.util.Map;
 ${imports}
 
 <#if visitBefore>
-class ${visitorName} implements DOMVisitBefore, SAXVisitBefore {
+class ${visitorName} implements BeforeVisitor {
 
     private SmooksResourceConfiguration config;
 
@@ -78,18 +75,8 @@ class ${visitorName} implements DOMVisitBefore, SAXVisitBefore {
 		this.config = config;
 	}
 
+    @Override
     public void visitBefore(Element element, ExecutionContext executionContext) {
-        Document document = element.getOwnerDocument();
-        Map nodeModels = DOMModel.getModel(executionContext).getModels();
-
-        def getBean = { beanId ->
-            executionContext.getBeanContext().getBean(beanId);
-        }
-
-        ${visitorScript}
-    }
-
-    public void visitBefore(SAXElement element, ExecutionContext executionContext) throws SmooksException, IOException {
         Map nodeModels = DOMModel.getModel(executionContext).getModels();
 
         def getBean = { beanId ->
@@ -100,7 +87,7 @@ class ${visitorName} implements DOMVisitBefore, SAXVisitBefore {
     }
 }
 <#else>
-class ${visitorName} implements DOMVisitAfter, SAXVisitBefore, SAXVisitAfter {
+class ${visitorName} implements BeforeVisitor, AfterVisitor {
 
     private SmooksResourceConfiguration config;
     private DomModelCreator modelCreator;
@@ -116,10 +103,6 @@ class ${visitorName} implements DOMVisitAfter, SAXVisitBefore, SAXVisitAfter {
 		format = config.getParameterValue("format", Boolean.class, false);
 		isWritingFragment = config.getParameterValue("writeFragment", Boolean.class, false);
 	}
-
-    public void visitAfter(Element element, ExecutionContext executionContext) {
-        visitAfter(element, executionContext, null);
-    }
 
     public void visitAfter(Element element, ExecutionContext executionContext, Writer writer) {
         Document document = element.getOwnerDocument();
@@ -142,35 +125,37 @@ class ${visitorName} implements DOMVisitAfter, SAXVisitBefore, SAXVisitAfter {
     }
 
     // visitBefore is required purely for setting up the model creator...
-    public void visitBefore(SAXElement element, ExecutionContext executionContext) throws SmooksException, IOException {
+    @Override
+    public void visitBefore(Element element, ExecutionContext executionContext) throws SmooksException {
         if(modelCreator != null) {
-            if(isWritingFragment) {
-                Writer currentWriter = element.getWriter(this);
+            if (isWritingFragment) {
+                Writer currentWriter = executionContext.getWriter();
                 // If fragment writing is on, we want to block output to the
                 // output stream...
-                element.setWriter(new NullWriter(currentWriter), this);
+                executionContext.setWriter(new NullWriter(currentWriter));
             }
 
             modelCreator.visitBefore(element, executionContext);
         }
     }
 
-    public void visitAfter(SAXElement element, ExecutionContext executionContext) throws SmooksException, IOException {
-        if(modelCreator != null) {
+    @Override
+    public void visitAfter(Element element, ExecutionContext executionContext) throws SmooksException {
+        if (modelCreator != null) {
             Document fragmentDoc = modelCreator.popCreator(executionContext);
             Element fragmentElement = fragmentDoc.getDocumentElement();
-
-            if(isWritingFragment) {
-                Writer writer = element.getWriter(this);
-                if(writer instanceof NullWriter) {
+            
+            if (isWritingFragment) {
+                Writer writer = executionContext.getWriter();
+                if (writer instanceof NullWriter) {
                     // Reset the writer...
                     writer = ((NullWriter)writer).getParentWriter();
-                    element.setWriter(writer, this);
+                    executionContext.setWriter(writer);
                 }
 
                 visitAfter(fragmentElement, executionContext, writer);
             } else {
-                visitAfter(fragmentElement, executionContext);
+                visitAfter(fragmentElement, executionContext, null);
             }
         } else {
             Map nodeModels = DOMModel.getModel(executionContext).getModels();
