@@ -43,11 +43,7 @@
   -->
 
 <smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd" xmlns:g="https://www.smooks.org/xsd/smooks/groovy-2.0.xsd">
-
-    <params>
-        <param name="stream.filter.type">SAX</param>
-    </params>
-
+    
     <!--
         More NodeModel testing for SAX.  With the SAX filter, we create a Node Model for the fragment.  This make
         the SAX events easier to work with...

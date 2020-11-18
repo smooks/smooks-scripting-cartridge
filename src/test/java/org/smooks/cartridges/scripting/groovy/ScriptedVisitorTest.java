@@ -42,40 +42,28 @@
  */
 package org.smooks.cartridges.scripting.groovy;
 
-import org.junit.Before;
-import org.junit.After;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import org.smooks.Smooks;
 import org.smooks.SmooksException;
-import org.smooks.FilterSettings;
-import org.smooks.StreamFilterType;
 import org.smooks.container.ExecutionContext;
-import org.smooks.delivery.Filter;
 import org.smooks.io.StreamUtils;
+import org.smooks.payload.JavaResult;
 import org.smooks.payload.StringResult;
 import org.smooks.payload.StringSource;
-import org.smooks.payload.JavaResult;
 import org.xml.sax.SAXException;
+import org.xmlunit.builder.DiffBuilder;
 
 import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
 import java.util.Map;
 
+import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
 /**
  * @author <a href="mailto:tom.fennelly@jboss.com">tom.fennelly@jboss.com</a>
  */
 public class ScriptedVisitorTest {
-
-    @Before
-    public void setUp() {
-        System.setProperty(Filter.STREAM_FILTER_TYPE, "DOM");
-    }
-
-    @After
-    public void tearDown() {
-        System.getProperties().remove(Filter.STREAM_FILTER_TYPE);
-    }
 
     @Test
     public void test_templated_01() throws IOException, SAXException {
@@ -85,7 +73,7 @@ public class ScriptedVisitorTest {
         ExecutionContext execContext = smooks.createExecutionContext();
 
         smooks.filterSource(execContext, new StringSource("<a><b><c/></b></a>"), result);
-        assertEquals("<a><b><xxx newElementAttribute=\"1234\"></xxx></b></a>", result.getResult());
+        assertEquals("<a><b><xxx newElementAttribute=\"1234\"/></b></a>", result.getResult());
     }
 
     @Test
@@ -94,7 +82,7 @@ public class ScriptedVisitorTest {
         StringResult result = new StringResult();
 
         smooks.filterSource(new StringSource("<a><b><c/></b></a>"), result);
-        assertEquals("<a><b><xxx newElementAttribute=\"1234\"></xxx></b></a>", result.getResult());
+        assertEquals("<a><b><xxx newElementAttribute=\"1234\"/></b></a>", result.getResult());
     }
 
     @Test
@@ -106,7 +94,7 @@ public class ScriptedVisitorTest {
             smooks.filterSource(new StringSource("<a><b><c/></b></a>"), result);
             fail("Expected SmooksException.");
         } catch(SmooksException e) {
-            assertEquals("Unable to filter InputStream for target profile [org.smooks.profile.Profile#default_profile].", e.getMessage());
+            assertEquals("Failed to filter source", e.getMessage());
         }
     }
 
@@ -119,7 +107,7 @@ public class ScriptedVisitorTest {
             smooks.filterSource(new StringSource("<a><b><c/></b></a>"), result);
             fail("Expected SmooksException.");
         } catch(SmooksException e) {
-            assertEquals("Unable to filter InputStream for target profile [org.smooks.profile.Profile#default_profile].", e.getMessage());
+            assertEquals("Failed to filter source", e.getMessage());
         }
     }
 
@@ -165,8 +153,7 @@ public class ScriptedVisitorTest {
         StringResult result = new StringResult();
 
         smooks.filterSource(new StringSource(shoppingList), result);
-        assertEquals(
-                "<shopping>\n" +
+        assertFalse(DiffBuilder.compare("<shopping>\n" +
                 "    <category type=\"groceries\">\n" +
                 "        <item>Luxury Chocolate</item>\n" +
                 "        <item>Luxury Coffee</item>\n" +
@@ -178,8 +165,7 @@ public class ScriptedVisitorTest {
                 "    <category type=\"present\">\n" +
                 "        \n" +
                 "    <item>Mum's Birthday</item><item when=\"Oct 15\">Monica's Birthday</item></category>\n" +
-                "</shopping>",
-                result.getResult());
+                "</shopping>").withTest(result.getResult()).ignoreWhitespace().build().hasDifferences());
     }
 
     @Test
@@ -188,8 +174,7 @@ public class ScriptedVisitorTest {
         StringResult result = new StringResult();
 
         smooks.filterSource(new StringSource(shoppingList), result);
-        assertEquals(
-                "<shopping>\n" +
+        assertFalse(DiffBuilder.compare("<shopping>\n" +
                 "    <category type=\"groceries\">\n" +
                 "        <item>Luxury Chocolate</item>\n" +
                 "        <item>Luxury Coffee</item>\n" +
@@ -201,8 +186,7 @@ public class ScriptedVisitorTest {
                 "    <category type=\"present\">\n" +
                 "        \n" +
                 "    <item>Mum's Birthday</item><item when=\"Oct 15\">Monica's Birthday</item></category>\n" +
-                "</shopping>",
-                result.getResult());
+                "</shopping>").withTest(result.getResult()).ignoreWhitespace().build().hasDifferences());
     }
 
     @Test
@@ -211,7 +195,7 @@ public class ScriptedVisitorTest {
         StringResult result = new StringResult();
 
         smooks.filterSource(new StringSource("<a><b><c/></b></a>"), result);
-        assertEquals("<a><b><newElX newElementAttribute=\"1234\"></newElX></b></a>", result.getResult());
+        assertEquals("<a><b><newElX newElementAttribute=\"1234\"/></b></a>", result.getResult());
     }
 
     @Test
@@ -281,21 +265,18 @@ public class ScriptedVisitorTest {
 
     @Test
     public void test_templated_ext_12() throws IOException, SAXException {
-        test_templated_ext_12_13("scripted-ext-12.xml", StreamFilterType.DOM);
-        test_templated_ext_12_13("scripted-ext-12.xml", StreamFilterType.SAX);
+        test_templated_ext_12_13("scripted-ext-12.xml");
     }
 
     @Test
     public void test_templated_ext_13() throws IOException, SAXException {
-        test_templated_ext_12_13("scripted-ext-13.xml", StreamFilterType.DOM);
-        test_templated_ext_12_13("scripted-ext-13.xml", StreamFilterType.SAX);
+        test_templated_ext_12_13("scripted-ext-13.xml");
     }
 
-    public void test_templated_ext_12_13(String config, StreamFilterType filterType) throws IOException, SAXException {
+    public void test_templated_ext_12_13(String config) throws IOException, SAXException {
         Smooks smooks = new Smooks(getClass().getResourceAsStream(config));
         JavaResult result = new JavaResult();
 
-        smooks.setFilterSettings(new FilterSettings(filterType));
         smooks.filterSource(new StreamSource(getClass().getResourceAsStream("order-message.xml")), result);
         Map orderItems = (Map) result.getBean("orderItems");
         Map orderItem;

@@ -71,6 +71,7 @@
 
                 // check the when attributes
                 assert element.'**'.item.'@when'.grep{it} == ["Urgent", "Oct 15"]
+                writeFragment(element);
             }
             -->
         </resource>

@@ -48,17 +48,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smooks.cdr.SmooksConfigurationException;
 import org.smooks.cdr.SmooksResourceConfiguration;
-import org.smooks.cdr.injector.Scope;
-import org.smooks.cdr.lifecycle.LifecycleManager;
-import org.smooks.cdr.lifecycle.phase.PostConstructLifecyclePhase;
-import org.smooks.cdr.registry.Registry;
 import org.smooks.delivery.ContentHandler;
 import org.smooks.delivery.ContentHandlerFactory;
 import org.smooks.delivery.DomModelCreator;
 import org.smooks.delivery.Visitor;
-import org.smooks.delivery.sax.SAXElement;
+import org.smooks.injector.Scope;
 import org.smooks.io.StreamUtils;
 import org.smooks.javabean.context.BeanContext;
+import org.smooks.lifecycle.LifecycleManager;
+import org.smooks.lifecycle.phase.PostConstructLifecyclePhase;
+import org.smooks.registry.Registry;
 import org.smooks.util.FreeMarkerTemplate;
 import org.smooks.xml.DomUtils;
 import org.w3c.dom.Element;
@@ -108,7 +107,7 @@ import java.util.Map;
  * <ol>
  *  <li>Only available in default mode i.e. when executeBefore equals "false".  If executeBefore is configured
  *      "true", this facility is not available and the Groovy script will only have access to the element
- *      as a {@link SAXElement}.</li>
+ *      as a {@link Element}.</li>
  *  <li>The DOM fragment must be explicitly writen to the result using "<b>writeFragment</b>".  See example below.</li>
  *  <li>There is an obvious performance overhead incurred using this facility (DOM construction).  That said, it can still
  *      be used to process huge messages because of how the {@link DomModelCreator} works for SAX.</li>
@@ -190,8 +189,8 @@ public class GroovyContentHandlerFactory implements ContentHandlerFactory {
     private Registry registry;
 
     @PostConstruct
-    public void initialize() throws IOException {
-        String templateText = StreamUtils.readStreamAsString(getClass().getResourceAsStream("/ScriptedGroovy.ftl"), "UTF-8");
+    public void postConstruct() throws IOException {
+        String templateText = StreamUtils.readStreamAsString(getClass().getResourceAsStream("/script.groovy.ftl"), "UTF-8");
         classTemplate = new FreeMarkerTemplate(templateText);
     }
 
@@ -199,7 +198,6 @@ public class GroovyContentHandlerFactory implements ContentHandlerFactory {
      * @see org.smooks.delivery.ContentHandlerFactory#create(org.smooks.cdr.SmooksResourceConfiguration)
      */
     public ContentHandler create(SmooksResourceConfiguration configuration) throws SmooksConfigurationException {
-
         try {
             byte[] groovyScriptBytes = configuration.getBytes();
             String groovyScript = new String(groovyScriptBytes, StandardCharsets.UTF_8);

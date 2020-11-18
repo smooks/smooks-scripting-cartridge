@@ -43,11 +43,7 @@
   -->
 
 <smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd" xmlns:g="https://www.smooks.org/xsd/smooks/groovy-2.0.xsd">
-
-    <params>
-        <param name="stream.filter.type">SAX</param>
-    </params>
-
+    
     <!--
         Test that the NodeModel created for SAX processing works....
     -->

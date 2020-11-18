@@ -52,6 +52,7 @@
         <g:script>
             element = DomUtils.renameElement(element, config.getParameterValue("newElementName", String.class), true, true);
             element.setAttribute("newElementAttribute", "1234");
+            writeFragment(element);
         </g:script>
         <param name="newElementName">newElX</param>
     </g:groovy>

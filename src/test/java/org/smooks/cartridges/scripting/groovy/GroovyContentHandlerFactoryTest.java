@@ -44,12 +44,12 @@ package org.smooks.cartridges.scripting.groovy;
 
 import org.junit.Test;
 import org.smooks.cdr.SmooksResourceConfiguration;
-import org.smooks.cdr.injector.Scope;
-import org.smooks.cdr.lifecycle.phase.PostConstructLifecyclePhase;
-import org.smooks.cdr.registry.lookup.LifecycleManagerLookup;
 import org.smooks.container.MockApplicationContext;
 import org.smooks.delivery.dom.DOMElementVisitor;
+import org.smooks.injector.Scope;
 import org.smooks.io.StreamUtils;
+import org.smooks.lifecycle.phase.PostConstructLifecyclePhase;
+import org.smooks.registry.lookup.LifecycleManagerLookup;
 import org.smooks.xml.XmlUtil;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
