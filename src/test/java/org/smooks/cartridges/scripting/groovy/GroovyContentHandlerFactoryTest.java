@@ -43,7 +43,7 @@
 package org.smooks.cartridges.scripting.groovy;
 
 import org.junit.Test;
-import org.smooks.cdr.SmooksResourceConfiguration;
+import org.smooks.cdr.ResourceConfig;
 import org.smooks.container.MockApplicationContext;
 import org.smooks.delivery.dom.DOMElementVisitor;
 import org.smooks.injector.Scope;
@@ -73,16 +73,16 @@ public class GroovyContentHandlerFactoryTest {
 	@Test
 	public void test_goodscript_by_Inlining() throws InstantiationException, IllegalArgumentException, IOException, SAXException {
 		String script = new String(StreamUtils.readStream(getClass().getResourceAsStream("MyGroovyScript.groovy")));
-		SmooksResourceConfiguration config = new SmooksResourceConfiguration("x", script);
+		ResourceConfig config = new ResourceConfig("x", script);
 
 		test_goodscript(config);
 	}
 
 	private void test_goodscript_by_URI(String path) throws InstantiationException, IllegalArgumentException, IOException, SAXException {
-		test_goodscript(new SmooksResourceConfiguration("x", path));
+		test_goodscript(new ResourceConfig("x", path));
 	}
 
-	private void test_goodscript(SmooksResourceConfiguration config) throws InstantiationException, IllegalArgumentException, IOException, SAXException {
+	private void test_goodscript(ResourceConfig config) throws InstantiationException, IllegalArgumentException, IOException, SAXException {
 		GroovyContentHandlerFactory creator = new GroovyContentHandlerFactory();
 		MockApplicationContext mockApplicationContext = new MockApplicationContext();
 		mockApplicationContext.getRegistry().lookup(new LifecycleManagerLookup()).applyPhase(creator, new PostConstructLifecyclePhase(new Scope(mockApplicationContext.getRegistry())));

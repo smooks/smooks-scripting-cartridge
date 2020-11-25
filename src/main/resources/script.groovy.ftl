@@ -47,7 +47,7 @@ import groovy.xml.dom.DOMCategory;
 import groovy.xml.DOMBuilder;
 
 import org.smooks.container.ExecutionContext;
-import org.smooks.cdr.SmooksResourceConfiguration;
+import org.smooks.cdr.ResourceConfig;
 import org.smooks.SmooksException;
 import org.smooks.javabean.context.BeanContext;
 
@@ -69,9 +69,9 @@ ${imports}
 <#if visitBefore>
 class ${visitorName} implements BeforeVisitor {
 
-    private SmooksResourceConfiguration config;
+    private ResourceConfig config;
 
-	public void setConfiguration(SmooksResourceConfiguration config) {
+	public void setConfiguration(ResourceConfig config) {
 		this.config = config;
 	}
 
@@ -89,12 +89,12 @@ class ${visitorName} implements BeforeVisitor {
 <#else>
 class ${visitorName} implements BeforeVisitor, AfterVisitor {
 
-    private SmooksResourceConfiguration config;
+    private ResourceConfig config;
     private DomModelCreator modelCreator;
     private boolean format = false;
     private boolean isWritingFragment = false;
 
-	public void setConfiguration(SmooksResourceConfiguration config) {
+	public void setConfiguration(ResourceConfig config) {
 		this.config = config;
 
 		if(config.getParameterValue("createDOMFragment", Boolean.class, true)) {
