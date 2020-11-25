@@ -42,7 +42,7 @@
  */
 package org.smooks.cartridges.scripting.groovy
 
-import org.smooks.cdr.SmooksResourceConfiguration
+import org.smooks.cdr.ResourceConfig
 import org.smooks.container.ExecutionContext
 import org.smooks.delivery.dom.DOMElementVisitor
 import org.smooks.xml.DomUtils
@@ -52,7 +52,7 @@ public class MyGroovyScript implements DOMElementVisitor {
 
 	String newName;
 	
-	public void setConfiguration(SmooksResourceConfiguration config) {
+	public void setConfiguration(ResourceConfig config) {
 		newName = config.getParameterValue("new-name", String.class, "zzz");
 	}
 

@@ -47,7 +47,7 @@ import org.codehaus.groovy.control.CompilationFailedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smooks.cdr.SmooksConfigurationException;
-import org.smooks.cdr.SmooksResourceConfiguration;
+import org.smooks.cdr.ResourceConfig;
 import org.smooks.delivery.ContentHandler;
 import org.smooks.delivery.ContentHandlerFactory;
 import org.smooks.delivery.DomModelCreator;
@@ -195,11 +195,11 @@ public class GroovyContentHandlerFactory implements ContentHandlerFactory {
     }
 
     /* (non-Javadoc)
-     * @see org.smooks.delivery.ContentHandlerFactory#create(org.smooks.cdr.SmooksResourceConfiguration)
+     * @see org.smooks.delivery.ContentHandlerFactory#create(org.smooks.cdr.ResourceConfig)
      */
-    public ContentHandler create(SmooksResourceConfiguration configuration) throws SmooksConfigurationException {
+    public ContentHandler create(ResourceConfig resourceConfig) throws SmooksConfigurationException {
         try {
-            byte[] groovyScriptBytes = configuration.getBytes();
+            byte[] groovyScriptBytes = resourceConfig.getBytes();
             String groovyScript = new String(groovyScriptBytes, StandardCharsets.UTF_8);
 
             Object groovyObject;
@@ -214,16 +214,16 @@ public class GroovyContentHandlerFactory implements ContentHandlerFactory {
             }
 
             if (!(groovyObject instanceof Visitor)) {
-                groovyObject = createFromTemplate(groovyScript, configuration);
+                groovyObject = createFromTemplate(groovyScript, resourceConfig);
             }
 
             ContentHandler groovyResource = (ContentHandler) groovyObject;
 
-            lifecycleManager.applyPhase(groovyResource, new PostConstructLifecyclePhase(new Scope(registry, configuration, groovyResource)));
+            lifecycleManager.applyPhase(groovyResource, new PostConstructLifecyclePhase(new Scope(registry, resourceConfig, groovyResource)));
 
             return groovyResource;
         } catch (Exception e) {
-            throw new SmooksConfigurationException("Error constructing class from Groovy script " + configuration.getResource(), e);
+            throw new SmooksConfigurationException("Error constructing class from Groovy script " + resourceConfig.getResource(), e);
         }
     }
 
@@ -232,21 +232,21 @@ public class GroovyContentHandlerFactory implements ContentHandlerFactory {
         return "groovy";
     }
 
-    private Object createFromTemplate(String groovyScript, SmooksResourceConfiguration configuration) throws InstantiationException, IllegalAccessException {
+    private Object createFromTemplate(String groovyScript, ResourceConfig resourceConfig) throws InstantiationException, IllegalAccessException {
         GroovyClassLoader groovyClassLoader = new GroovyClassLoader(getClass().getClassLoader());
         Map<String, Object> templateVars = new HashMap<>();
-        String imports = configuration.getParameterValue("imports", String.class, "");
+        String imports = resourceConfig.getParameterValue("imports", String.class, "");
 
         templateVars.put("imports", cleanImportsConfig(imports));
         templateVars.put("visitorName", createClassName());
-        templateVars.put("elementName", getElementName(configuration));
-        templateVars.put("visitBefore", Boolean.parseBoolean(configuration.getParameterValue("executeBefore", String.class, "false")));
+        templateVars.put("elementName", getElementName(resourceConfig));
+        templateVars.put("visitBefore", Boolean.parseBoolean(resourceConfig.getParameterValue("executeBefore", String.class, "false")));
         templateVars.put("visitorScript", groovyScript);
 
         String templatedClass = classTemplate.apply(templateVars);
 
         if (groovyScript.contains("writeFragment")) {
-            configuration.setParameter("writeFragment", "true");
+            resourceConfig.setParameter("writeFragment", "true");
         }
 
         try {
@@ -279,8 +279,8 @@ public class GroovyContentHandlerFactory implements ContentHandlerFactory {
         return className.toString();
     }
 
-    private String getElementName(SmooksResourceConfiguration configuration) {
-        String elementName = configuration.getSelectorPath().getTargetElement();
+    private String getElementName(ResourceConfig resourceConfig) {
+        String elementName = resourceConfig.getSelectorPath().getTargetElement();
 
         for (int i = 0; i < elementName.length(); i++) {
             if (!Character.isLetterOrDigit(elementName.charAt(i))) {
