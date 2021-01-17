@@ -54,8 +54,9 @@ import org.smooks.javabean.context.BeanContext;
 import org.smooks.delivery.DomModelCreator;
 import org.smooks.delivery.DOMModel;
 import org.smooks.delivery.dom.serialize.Serializer;
+import org.smooks.delivery.fragment.NodeFragment
 import org.smooks.xml.*;
-import org.smooks.io.NullWriter;
+import org.smooks.io.*;
 
 import org.smooks.delivery.sax.ng.BeforeVisitor;
 import org.smooks.delivery.sax.ng.AfterVisitor;
@@ -129,10 +130,9 @@ class ${visitorName} implements BeforeVisitor, AfterVisitor {
     public void visitBefore(Element element, ExecutionContext executionContext) throws SmooksException {
         if(modelCreator != null) {
             if (isWritingFragment) {
-                Writer currentWriter = executionContext.getWriter();
-                // If fragment writing is on, we want to block output to the
-                // output stream...
-                executionContext.setWriter(new NullWriter(currentWriter));
+                FragmentWriter fragmentWriter = new FragmentWriter(executionContext, new NodeFragment(element, true))
+                fragmentWriter.capture()
+                executionContext.getMementoCaretaker().save(new FragmentWriterMemento(this, fragmentWriter))
             }
 
             modelCreator.visitBefore(element, executionContext);
@@ -146,13 +146,9 @@ class ${visitorName} implements BeforeVisitor, AfterVisitor {
             Element fragmentElement = fragmentDoc.getDocumentElement();
             
             if (isWritingFragment) {
-                Writer writer = executionContext.getWriter();
-                if (writer instanceof NullWriter) {
-                    // Reset the writer...
-                    writer = ((NullWriter)writer).getParentWriter();
-                    executionContext.setWriter(writer);
-                }
-
+                FragmentWriterMemento fragmentWriterMemento = new FragmentWriterMemento(this, new FragmentWriter(executionContext, new NodeFragment(element, true)))
+                executionContext.getMementoCaretaker().restore(fragmentWriterMemento)
+                Writer writer = fragmentWriterMemento.getFragmentWriter();
                 visitAfter(fragmentElement, executionContext, writer);
             } else {
                 visitAfter(fragmentElement, executionContext, null);
