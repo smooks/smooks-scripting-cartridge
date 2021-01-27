@@ -40,30 +40,32 @@
  Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  =========================LICENSE_END==================================
 -->
-package org.smooks.cartridges.scripting.groovy;
+package org.smooks.cartridges.scripting.groovy
 
-import groovy.xml.XmlUtil;
-import groovy.xml.dom.DOMCategory;
-import groovy.xml.DOMBuilder;
+import groovy.xml.XmlUtil
+import groovy.xml.dom.DOMCategory
+import groovy.xml.DOMBuilder
 
-import org.smooks.container.ExecutionContext;
-import org.smooks.cdr.ResourceConfig;
-import org.smooks.SmooksException;
-import org.smooks.javabean.context.BeanContext;
+import org.smooks.container.ExecutionContext
+import org.smooks.cdr.ResourceConfig
+import org.smooks.SmooksException
+import org.smooks.javabean.context.BeanContext
 
-import org.smooks.delivery.DomModelCreator;
-import org.smooks.delivery.DOMModel;
-import org.smooks.delivery.dom.serialize.Serializer;
+import org.smooks.delivery.DomModelCreator
+import org.smooks.delivery.DOMModel
+import org.smooks.delivery.dom.serialize.Serializer
+import org.smooks.delivery.fragment.Fragment
 import org.smooks.delivery.fragment.NodeFragment
-import org.smooks.xml.*;
-import org.smooks.io.*;
+import org.smooks.delivery.memento.Memento
+import org.smooks.xml.*
+import org.smooks.io.*
 
-import org.smooks.delivery.sax.ng.BeforeVisitor;
-import org.smooks.delivery.sax.ng.AfterVisitor;
+import org.smooks.delivery.sax.ng.BeforeVisitor
+import org.smooks.delivery.sax.ng.AfterVisitor
 
-import java.io.IOException;
-import org.w3c.dom.*;
-import java.util.Map;
+import java.io.IOException
+import org.w3c.dom.*
+import java.util.Map
 
 ${imports}
 
@@ -130,9 +132,10 @@ class ${visitorName} implements BeforeVisitor, AfterVisitor {
     public void visitBefore(Element element, ExecutionContext executionContext) throws SmooksException {
         if(modelCreator != null) {
             if (isWritingFragment) {
-                FragmentWriter fragmentWriter = new FragmentWriter(executionContext, new NodeFragment(element, true))
-                fragmentWriter.capture()
-                executionContext.getMementoCaretaker().save(new FragmentWriterMemento(this, fragmentWriter))
+                Fragment nodeFragment = new NodeFragment(element, true)
+                FragmentWriter fragmentWriter = new FragmentWriter(executionContext, nodeFragment)
+                fragmentWriter.park()
+                executionContext.getMementoCaretaker().capture(new Memento<>(nodeFragment, this, fragmentWriter))
             }
 
             modelCreator.visitBefore(element, executionContext);
@@ -146,9 +149,10 @@ class ${visitorName} implements BeforeVisitor, AfterVisitor {
             Element fragmentElement = fragmentDoc.getDocumentElement();
             
             if (isWritingFragment) {
-                FragmentWriterMemento fragmentWriterMemento = new FragmentWriterMemento(this, new FragmentWriter(executionContext, new NodeFragment(element, true)))
+                Fragment nodeFragment = new NodeFragment(element, true)
+                Memento fragmentWriterMemento = new Memento<>(nodeFragment, this, new FragmentWriter(executionContext, nodeFragment))
                 executionContext.getMementoCaretaker().restore(fragmentWriterMemento)
-                Writer writer = fragmentWriterMemento.getFragmentWriter();
+                Writer writer = fragmentWriterMemento.getState();
                 visitAfter(fragmentElement, executionContext, writer);
             } else {
                 visitAfter(fragmentElement, executionContext, null);
