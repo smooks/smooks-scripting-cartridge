@@ -56,7 +56,7 @@ import org.smooks.delivery.DOMModel
 import org.smooks.delivery.dom.serialize.Serializer
 import org.smooks.delivery.fragment.Fragment
 import org.smooks.delivery.fragment.NodeFragment
-import org.smooks.delivery.memento.Memento
+import org.smooks.delivery.memento.*
 import org.smooks.xml.*
 import org.smooks.io.*
 
@@ -135,7 +135,7 @@ class ${visitorName} implements BeforeVisitor, AfterVisitor {
                 Fragment nodeFragment = new NodeFragment(element, true)
                 FragmentWriter fragmentWriter = new FragmentWriter(executionContext, nodeFragment)
                 fragmentWriter.park()
-                executionContext.getMementoCaretaker().capture(new Memento<>(nodeFragment, this, fragmentWriter))
+                executionContext.getMementoCaretaker().capture(new SimpleVisitorMemento<>(nodeFragment, this, fragmentWriter))
             }
 
             modelCreator.visitBefore(element, executionContext);
@@ -150,7 +150,7 @@ class ${visitorName} implements BeforeVisitor, AfterVisitor {
             
             if (isWritingFragment) {
                 Fragment nodeFragment = new NodeFragment(element, true)
-                Memento fragmentWriterMemento = new Memento<>(nodeFragment, this, new FragmentWriter(executionContext, nodeFragment))
+                VisitorMemento fragmentWriterMemento = new SimpleVisitorMemento<>(nodeFragment, this, new FragmentWriter(executionContext, nodeFragment))
                 executionContext.getMementoCaretaker().restore(fragmentWriterMemento)
                 Writer writer = fragmentWriterMemento.getState();
                 visitAfter(fragmentElement, executionContext, writer);
