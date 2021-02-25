@@ -46,26 +46,24 @@ import groovy.xml.XmlUtil
 import groovy.xml.dom.DOMCategory
 import groovy.xml.DOMBuilder
 
-import org.smooks.container.ExecutionContext
-import org.smooks.cdr.ResourceConfig
-import org.smooks.SmooksException
-import org.smooks.javabean.context.BeanContext
-
-import org.smooks.delivery.DomModelCreator
-import org.smooks.delivery.DOMModel
-import org.smooks.delivery.dom.serialize.Serializer
-import org.smooks.delivery.fragment.Fragment
-import org.smooks.delivery.fragment.NodeFragment
-import org.smooks.delivery.memento.*
-import org.smooks.xml.*
+import org.smooks.api.ExecutionContext
+import org.smooks.api.resource.config.ResourceConfig
+import org.smooks.api.SmooksException
+import org.smooks.api.bean.context.BeanContext
+import org.smooks.api.delivery.fragment.Fragment
+import org.smooks.engine.memento.SimpleVisitorMemento
+import org.smooks.engine.memento.VisitorMemento
+import org.smooks.engine.resource.visitor.dom.DomModelCreator
+import org.smooks.engine.resource.visitor.dom.DOMModel
+import org.smooks.engine.delivery.dom.serialize.Serializer
+import org.smooks.engine.delivery.fragment.NodeFragment
+import org.smooks.support.*
 import org.smooks.io.*
 
-import org.smooks.delivery.sax.ng.BeforeVisitor
-import org.smooks.delivery.sax.ng.AfterVisitor
+import org.smooks.api.resource.visitor.sax.ng.BeforeVisitor
+import org.smooks.api.resource.visitor.sax.ng.AfterVisitor
 
-import java.io.IOException
 import org.w3c.dom.*
-import java.util.Map
 
 ${imports}
 

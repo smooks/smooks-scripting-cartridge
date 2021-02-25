@@ -43,13 +43,14 @@
 package org.smooks.cartridges.scripting.groovy;
 
 import org.junit.Test;
-import org.smooks.cdr.ResourceConfig;
-import org.smooks.container.MockApplicationContext;
-import org.smooks.delivery.dom.DOMElementVisitor;
-import org.smooks.injector.Scope;
+import org.smooks.api.resource.config.ResourceConfig;
+import org.smooks.api.resource.visitor.dom.DOMElementVisitor;
+import org.smooks.engine.injector.Scope;
+import org.smooks.engine.lookup.LifecycleManagerLookup;
+import org.smooks.engine.resource.config.DefaultResourceConfig;
 import org.smooks.io.StreamUtils;
-import org.smooks.lifecycle.phase.PostConstructLifecyclePhase;
-import org.smooks.registry.lookup.LifecycleManagerLookup;
+import org.smooks.engine.lifecycle.PostConstructLifecyclePhase;
+import org.smooks.tck.MockApplicationContext;
 import org.smooks.xml.XmlUtil;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -73,13 +74,13 @@ public class GroovyContentHandlerFactoryTest {
 	@Test
 	public void test_goodscript_by_Inlining() throws InstantiationException, IllegalArgumentException, IOException, SAXException {
 		String script = new String(StreamUtils.readStream(getClass().getResourceAsStream("MyGroovyScript.groovy")));
-		ResourceConfig config = new ResourceConfig("x", script);
+		ResourceConfig config = new DefaultResourceConfig("x", script);
 
 		test_goodscript(config);
 	}
 
 	private void test_goodscript_by_URI(String path) throws InstantiationException, IllegalArgumentException, IOException, SAXException {
-		test_goodscript(new ResourceConfig("x", path));
+		test_goodscript(new DefaultResourceConfig("x", path));
 	}
 
 	private void test_goodscript(ResourceConfig config) throws InstantiationException, IllegalArgumentException, IOException, SAXException {

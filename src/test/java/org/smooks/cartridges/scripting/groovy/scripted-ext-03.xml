@@ -47,7 +47,7 @@
     <g:groovy executeOnElement="c" executeBefore="true">
         <g:script>
             <!--
-            new org.smooks.io.FragmentWriter(executionContext, new org.smooks.delivery.fragment.NodeFragment(element)).write('<xxx newElementAttribute="1234"></xxx>');
+            new org.smooks.io.FragmentWriter(executionContext, new org.smooks.engine.delivery.fragment.NodeFragment(element)).write('<xxx newElementAttribute="1234"></xxx>');
             -->
         </g:script>
     </g:groovy>

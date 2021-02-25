@@ -46,20 +46,20 @@ import groovy.lang.GroovyClassLoader;
 import org.codehaus.groovy.control.CompilationFailedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.smooks.cdr.SmooksConfigurationException;
-import org.smooks.cdr.ResourceConfig;
-import org.smooks.delivery.ContentHandler;
-import org.smooks.delivery.ContentHandlerFactory;
-import org.smooks.delivery.DomModelCreator;
-import org.smooks.delivery.Visitor;
-import org.smooks.injector.Scope;
+import org.smooks.api.SmooksConfigException;
+import org.smooks.api.delivery.ContentHandler;
+import org.smooks.api.lifecycle.LifecycleManager;
+import org.smooks.api.resource.config.ResourceConfig;
+import org.smooks.api.delivery.ContentHandlerFactory;
+import org.smooks.api.resource.visitor.Visitor;
+import org.smooks.engine.injector.Scope;
+import org.smooks.engine.resource.visitor.dom.DomModelCreator;
 import org.smooks.io.StreamUtils;
-import org.smooks.javabean.context.BeanContext;
-import org.smooks.lifecycle.LifecycleManager;
-import org.smooks.lifecycle.phase.PostConstructLifecyclePhase;
-import org.smooks.registry.Registry;
-import org.smooks.util.FreeMarkerTemplate;
-import org.smooks.xml.DomUtils;
+import org.smooks.api.bean.context.BeanContext;
+import org.smooks.engine.lifecycle.PostConstructLifecyclePhase;
+import org.smooks.api.Registry;
+import org.smooks.support.FreeMarkerTemplate;
+import org.smooks.support.DomUtils;
 import org.w3c.dom.Element;
 
 import javax.annotation.PostConstruct;
@@ -79,7 +79,7 @@ import java.util.Map;
  * <ul>
  *  <li><b>Imports</b>: Imports can be added via the "imports" element.  A number of classes are automatically imported:
  *      <ul>
- *          <li>{@link DomUtils org.smooks.xml.DomUtils}</li>
+ *          <li>{@link DomUtils org.smooks.support.DomUtils}</li>
  *          <li>{@link BeanContext}</li>
  *          <li>{@link org.w3c.dom org.w3c.dom.*}</li>
  *          <li>groovy.xml.dom.DOMCategory, groovy.xml.dom.DOMUtil, groovy.xml.DOMBuilder</li>
@@ -195,9 +195,9 @@ public class GroovyContentHandlerFactory implements ContentHandlerFactory {
     }
 
     /* (non-Javadoc)
-     * @see org.smooks.delivery.ContentHandlerFactory#create(org.smooks.cdr.ResourceConfig)
+     * @see org.smooks.api.delivery.ContentHandlerFactory#create(org.smooks.api.resource.config.ResourceConfig)
      */
-    public ContentHandler create(ResourceConfig resourceConfig) throws SmooksConfigurationException {
+    public ContentHandler create(ResourceConfig resourceConfig) throws SmooksConfigException {
         try {
             byte[] groovyScriptBytes = resourceConfig.getBytes();
             String groovyScript = new String(groovyScriptBytes, StandardCharsets.UTF_8);
@@ -223,7 +223,7 @@ public class GroovyContentHandlerFactory implements ContentHandlerFactory {
 
             return groovyResource;
         } catch (Exception e) {
-            throw new SmooksConfigurationException("Error constructing class from Groovy script " + resourceConfig.getResource(), e);
+            throw new SmooksConfigException("Error constructing class from Groovy script " + resourceConfig.getResource(), e);
         }
     }
 
@@ -253,7 +253,7 @@ public class GroovyContentHandlerFactory implements ContentHandlerFactory {
             Class groovyClass = groovyClassLoader.parseClass(templatedClass);
             return groovyClass.newInstance();
         } catch (CompilationFailedException e) {
-            throw new SmooksConfigurationException("Failed to compile Groovy scripted Visitor class:\n==========================\n" + templatedClass + "\n==========================\n", e);
+            throw new SmooksConfigException("Failed to compile Groovy scripted Visitor class:\n==========================\n" + templatedClass + "\n==========================\n", e);
         }
     }
 
