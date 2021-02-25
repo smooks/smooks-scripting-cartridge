@@ -47,7 +47,7 @@
     <resource-config selector="c">
         <resource type="groovy">
             <!--
-            new org.smooks.io.FragmentWriter(executionContext, new org.smooks.delivery.fragment.NodeFragment(element)).write('<xxx newElementAttribute="1234"></xxx>');            
+            new org.smooks.io.FragmentWriter(executionContext, new org.smooks.engine.delivery.fragment.NodeFragment(element)).write('<xxx newElementAttribute="1234"></xxx>');            
             -->
         </resource>
         <param name="executeBefore">true</param>
