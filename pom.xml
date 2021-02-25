@@ -200,6 +200,7 @@
             <groupId>org.smooks</groupId>
             <artifactId>smooks-tck</artifactId>
             <version>${smooks.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
