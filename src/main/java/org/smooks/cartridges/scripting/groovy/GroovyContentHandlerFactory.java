@@ -54,12 +54,12 @@ import org.smooks.api.delivery.ContentHandlerFactory;
 import org.smooks.api.resource.visitor.Visitor;
 import org.smooks.engine.injector.Scope;
 import org.smooks.engine.resource.visitor.dom.DomModelCreator;
-import org.smooks.io.StreamUtils;
 import org.smooks.api.bean.context.BeanContext;
 import org.smooks.engine.lifecycle.PostConstructLifecyclePhase;
 import org.smooks.api.Registry;
 import org.smooks.support.FreeMarkerTemplate;
 import org.smooks.support.DomUtils;
+import org.smooks.support.StreamUtils;
 import org.w3c.dom.Element;
 
 import javax.annotation.PostConstruct;

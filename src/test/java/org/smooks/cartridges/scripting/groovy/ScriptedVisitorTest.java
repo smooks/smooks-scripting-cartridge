@@ -46,10 +46,10 @@ import org.junit.Test;
 import org.smooks.Smooks;
 import org.smooks.api.SmooksException;
 import org.smooks.api.ExecutionContext;
-import org.smooks.io.StreamUtils;
 import org.smooks.io.payload.JavaResult;
 import org.smooks.io.payload.StringResult;
 import org.smooks.io.payload.StringSource;
+import org.smooks.support.StreamUtils;
 import org.xml.sax.SAXException;
 import org.xmlunit.builder.DiffBuilder;
 
