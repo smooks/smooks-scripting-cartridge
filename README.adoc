@@ -1,0 +1,83 @@
+= Smooks Scripting Cartridge
+
+image:https://img.shields.io/maven-central/v/org.smooks.cartridges/smooks-scripting-cartridge[Maven Central]
+image:https://img.shields.io/nexus/s/org.smooks.cartridges/smooks-scripting-cartridge?server=https%3A%2F%2Foss.sonatype.org[Sonatype Nexus (Snapshots)]
+image:https://github.com/smooks/smooks-scripting-cartridge/workflows/CI/badge.svg[Build Status]
+
+// tag::smooks-scripting-cartridge[]
+Support for https://groovy-lang.org/[Groovy] scripting is made available through the `+https://www.smooks.org/xsd/smooks/groovy-2.0.xsd+` configuration namespace.
+
+Example configuration:
+
+.smooks-config.xml
+[source,xml]
+----
+<?xml version="1.0"?>
+<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
+                      xmlns:g="https://www.smooks.org/xsd/smooks/groovy-2.0.xsd">
+
+    <g:groovy executeOnElement="xxx">
+        <g:script>
+        <!--
+ //Rename the target fragment element from "xxx" to "yyy"...
+ DomUtils.renameElement(element, "yyy", true, true);
+ -->
+        </g:script>
+    </g:groovy>
+
+</smooks-resource-list>
+----
+
+*Usage Tips*
+
+. Imports can be added via the `+imports+` element. A number of classes are automatically imported:
+* `+org.smooks.support.DomUtils+`
+* `+org.smooks.api.bean.context.BeanContext+`
+* `+org.smooks.api.bean.repository.BeanRepository+`
+* `+org.w3c.dom.*+`
+* `+groovy.xml.dom.DOMCategory+`, `+groovy.xml.dom.DOMUtil+`, `+groovy.xml.DOMBuilder+`
+. The visited element is available to the script through the variable `+element+`. It is also available under a variable name equal to the element name, but only if the element name contains alpha-numeric characters only.
+. By default, the script is executed on the _visitAfter_ event. You can direct it to be executed on the _visitBefore_ by setting the `+executeBefore+` attribute to `+true+`.
+. If the script contains special XML characters, it can be wrapped in an XML Comment or CDATA section.
+
+== Groovy Scriptlet Variables and Methods
+
+A number of variables and methods are made directly available to groovy scriptlet code i.e. you can reference them directly in your scriptlet.
+
+=== Variables
+
+* `+element+`: The DOM/SAX Element (depending on which filter type is in use) i.e. `+org.w3c.dom.Element+` or `+org.api.smooks.delivery.sax.SAXElement+`.
+* `+executionContext+`: The Smooks `+ExecutionContext+` instance associated with the Smooks filtering operation.
+* `+nodeModels+`: A map containing all the DOM NodeModels currently available (i.e., `+Map<String, Element>+`).
+
+=== Methods
+
+* Get a bean from `+Object BeanContext#getBean(String beandId)+`.
+
+== Adding Beans to the BeanContext
+
+As shown above, all scriptlet code can access the beans by calling `+BeanContext#getBean(String)+` from inside the scriptlet code. One oversight when implementing this feature was that we didn't provide an `+addBean+` method for adding beans to the bean context. However, it is still possible to do so in a slightly more long-winded method via the `+executionContext+` e.g.:
+
+[source,java]
+----
+executionContext.getBeanContext().addBean("myBean", myBeanInstance);
+----
+
+== Maven Coordinates
+
+.pom.xml
+[source,xml]
+----
+<dependency>
+    <groupId>org.smooks.cartridges</groupId>
+    <artifactId>smooks-scripting-cartridge</artifactId>
+    <version>2.0.0-M3</version>
+</dependency>
+----
+// end::smooks-scripting-cartridge[]
+
+== License
+
+Smooks Scripting Cartridge is open source and licensed under the terms of the Apache License Version 2.0, or the GNU Lesser General Public License version 3.0 or later. You may use Smooks Scripting Cartridge according to either of these licenses as is most appropriate for your project.
+
+`+SPDX-License-Identifier: Apache-2.0 OR LGPL-3.0-or-later+`
