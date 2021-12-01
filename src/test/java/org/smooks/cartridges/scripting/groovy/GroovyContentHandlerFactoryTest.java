@@ -57,6 +57,7 @@ import org.xml.sax.SAXException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
 
@@ -74,13 +75,13 @@ public class GroovyContentHandlerFactoryTest {
 	@Test
 	public void test_goodscript_by_Inlining() throws InstantiationException, IllegalArgumentException, IOException, SAXException {
 		String script = new String(StreamUtils.readStream(getClass().getResourceAsStream("MyGroovyScript.groovy")));
-		ResourceConfig config = new DefaultResourceConfig("x", script);
+		ResourceConfig config = new DefaultResourceConfig("x", new Properties(), script);
 
 		test_goodscript(config);
 	}
 
 	private void test_goodscript_by_URI(String path) throws InstantiationException, IllegalArgumentException, IOException, SAXException {
-		test_goodscript(new DefaultResourceConfig("x", path));
+		test_goodscript(new DefaultResourceConfig("x", new Properties(), path));
 	}
 
 	private void test_goodscript(ResourceConfig config) throws InstantiationException, IllegalArgumentException, IOException, SAXException {
