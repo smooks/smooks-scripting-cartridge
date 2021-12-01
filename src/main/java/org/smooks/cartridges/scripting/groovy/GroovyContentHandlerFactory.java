@@ -53,6 +53,7 @@ import org.smooks.api.resource.config.ResourceConfig;
 import org.smooks.api.delivery.ContentHandlerFactory;
 import org.smooks.api.resource.visitor.Visitor;
 import org.smooks.engine.injector.Scope;
+import org.smooks.engine.resource.config.xpath.step.ElementSelectorStep;
 import org.smooks.engine.resource.visitor.dom.DomModelCreator;
 import org.smooks.api.bean.context.BeanContext;
 import org.smooks.engine.lifecycle.PostConstructLifecyclePhase;
@@ -280,7 +281,7 @@ public class GroovyContentHandlerFactory implements ContentHandlerFactory {
     }
 
     private String getElementName(ResourceConfig resourceConfig) {
-        String elementName = resourceConfig.getSelectorPath().getTargetElement();
+        String elementName = ((ElementSelectorStep) resourceConfig.getSelectorPath().getTargetSelectorStep()).getQName().getLocalPart();
 
         for (int i = 0; i < elementName.length(); i++) {
             if (!Character.isLetterOrDigit(elementName.charAt(i))) {
