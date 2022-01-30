@@ -47,12 +47,14 @@ import org.codehaus.groovy.control.CompilationFailedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smooks.api.SmooksConfigException;
+import org.smooks.api.SmooksException;
 import org.smooks.api.delivery.ContentHandler;
 import org.smooks.api.lifecycle.LifecycleManager;
 import org.smooks.api.resource.config.ResourceConfig;
 import org.smooks.api.delivery.ContentHandlerFactory;
 import org.smooks.api.resource.visitor.Visitor;
 import org.smooks.engine.injector.Scope;
+import org.smooks.engine.resource.config.xpath.IndexedSelectorPath;
 import org.smooks.engine.resource.config.xpath.step.ElementSelectorStep;
 import org.smooks.engine.resource.visitor.dom.DomModelCreator;
 import org.smooks.api.bean.context.BeanContext;
@@ -281,14 +283,18 @@ public class GroovyContentHandlerFactory implements ContentHandlerFactory {
     }
 
     private String getElementName(ResourceConfig resourceConfig) {
-        String elementName = ((ElementSelectorStep) resourceConfig.getSelectorPath().getTargetSelectorStep()).getQName().getLocalPart();
+        if (resourceConfig.getSelectorPath() instanceof IndexedSelectorPath) {
+            final String elementName = ((ElementSelectorStep) ((IndexedSelectorPath) resourceConfig.getSelectorPath()).getTargetSelectorStep()).getQName().getLocalPart();
 
-        for (int i = 0; i < elementName.length(); i++) {
-            if (!Character.isLetterOrDigit(elementName.charAt(i))) {
-                return elementName + "_Mangled";
+            for (int i = 0; i < elementName.length(); i++) {
+                if (!Character.isLetterOrDigit(elementName.charAt(i))) {
+                    return elementName + "_Mangled";
+                }
             }
-        }
 
-        return elementName;
+            return elementName;
+        } else {
+            throw new SmooksException("Can only get element name from org.smooks.engine.resource.config.xpath.IndexedSelectorPath");
+        }
     }
 }
