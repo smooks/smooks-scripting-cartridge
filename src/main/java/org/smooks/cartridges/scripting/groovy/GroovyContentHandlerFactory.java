@@ -65,7 +65,7 @@ import org.smooks.support.DomUtils;
 import org.smooks.support.StreamUtils;
 import org.w3c.dom.Element;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.io.StringReader;
