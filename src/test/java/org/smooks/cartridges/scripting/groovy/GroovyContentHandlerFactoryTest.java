@@ -42,7 +42,7 @@
  */
 package org.smooks.cartridges.scripting.groovy;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.smooks.api.resource.config.ResourceConfig;
 import org.smooks.api.resource.visitor.dom.DOMElementVisitor;
 import org.smooks.engine.injector.Scope;
