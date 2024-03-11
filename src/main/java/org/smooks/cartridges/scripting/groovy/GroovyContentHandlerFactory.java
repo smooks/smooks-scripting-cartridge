@@ -6,35 +6,35 @@
  * %%
  * Licensed under the terms of the Apache License Version 2.0, or
  * the GNU Lesser General Public License version 3.0 or later.
- * 
+ *
  * SPDX-License-Identifier: Apache-2.0 OR LGPL-3.0-or-later
- * 
+ *
  * ======================================================================
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * ======================================================================
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3 of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -66,8 +66,11 @@ import org.smooks.support.StreamUtils;
 import org.w3c.dom.Element;
 
 import jakarta.annotation.PostConstruct;
+
 import javax.inject.Inject;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -133,7 +136,7 @@ import java.util.Map;
  *     &lt;/category&gt;
  * &lt;/shopping&gt;
  * </pre>
- *
+ * <p>
  * Using Groovy, we want to modify the "supplies" category in the shopping list, adding 2 to the
  * quantity, where the item is "Pens".  To do this, we write a simple little Groovy script and target
  * it at the &lt;category&gt; elements in the message.  The script simple iterates over the &lt;item&gt; elements
@@ -235,7 +238,7 @@ public class GroovyContentHandlerFactory implements ContentHandlerFactory {
         return "groovy";
     }
 
-    private Object createFromTemplate(String groovyScript, ResourceConfig resourceConfig) throws InstantiationException, IllegalAccessException {
+    protected Object createFromTemplate(String groovyScript, ResourceConfig resourceConfig) throws InstantiationException, IllegalAccessException {
         GroovyClassLoader groovyClassLoader = new GroovyClassLoader(getClass().getClassLoader());
         Map<String, Object> templateVars = new HashMap<>();
         String imports = resourceConfig.getParameterValue("imports", String.class, "");
@@ -260,9 +263,9 @@ public class GroovyContentHandlerFactory implements ContentHandlerFactory {
         }
     }
 
-    private Object cleanImportsConfig(String imports) {
+    protected Object cleanImportsConfig(String imports) {
         try {
-            StringBuffer importsBuffer = StreamUtils.trimLines(new StringReader(imports));
+            StringBuffer importsBuffer = trimLines(new StringReader(imports));
             imports = importsBuffer.toString();
         } catch (IOException e) {
             throw new IllegalStateException("Unexpected IOException reading String.", e);
@@ -271,7 +274,7 @@ public class GroovyContentHandlerFactory implements ContentHandlerFactory {
         return imports.replace("import ", "\nimport ");
     }
 
-    private synchronized String createClassName() {
+    protected synchronized String createClassName() {
         StringBuilder className = new StringBuilder();
 
         className.append("SmooksVisitor_");
@@ -282,7 +285,7 @@ public class GroovyContentHandlerFactory implements ContentHandlerFactory {
         return className.toString();
     }
 
-    private String getElementName(ResourceConfig resourceConfig) {
+    protected String getElementName(ResourceConfig resourceConfig) {
         if (resourceConfig.getSelectorPath() instanceof IndexedSelectorPath) {
             final String elementName = ((ElementSelectorStep) ((IndexedSelectorPath) resourceConfig.getSelectorPath()).getTargetSelectorStep()).getQName().getLocalPart();
 
@@ -296,5 +299,17 @@ public class GroovyContentHandlerFactory implements ContentHandlerFactory {
         } else {
             throw new SmooksException("Can only get element name from org.smooks.engine.resource.config.xpath.IndexedSelectorPath");
         }
+    }
+
+    protected StringBuffer trimLines(Reader charStream) throws IOException {
+        StringBuffer stringBuf = new StringBuffer();
+        BufferedReader reader = new BufferedReader(charStream);
+        String line;
+
+        while ((line = reader.readLine()) != null) {
+            stringBuf.append(line.trim());
+        }
+
+        return stringBuf;
     }
 }

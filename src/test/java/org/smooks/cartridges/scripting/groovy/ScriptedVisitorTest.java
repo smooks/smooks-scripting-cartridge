@@ -44,12 +44,11 @@ package org.smooks.cartridges.scripting.groovy;
 
 import org.junit.Test;
 import org.smooks.Smooks;
-import org.smooks.api.SmooksException;
 import org.smooks.api.ExecutionContext;
+import org.smooks.api.SmooksException;
 import org.smooks.io.payload.JavaResult;
 import org.smooks.io.payload.StringResult;
 import org.smooks.io.payload.StringSource;
-import org.smooks.support.StreamUtils;
 import org.xml.sax.SAXException;
 import org.xmlunit.builder.DiffBuilder;
 
@@ -57,8 +56,11 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.smooks.tck.Assertions.compareCharStreams;
 
 /**
  * @author <a href="mailto:tom.fennelly@jboss.com">tom.fennelly@jboss.com</a>
@@ -221,7 +223,7 @@ public class ScriptedVisitorTest {
         StringResult result = new StringResult();
 
         smooks.filterSource(new StringSource(shoppingList), result);
-        assertTrue(StreamUtils.compareCharStreams(
+        assertTrue(compareCharStreams(
                 "<shopping>\n" +
                 "    <category type=\"groceries\">\n" +
                 "        <item>Luxury Chocolate</item>\n" +
@@ -245,7 +247,7 @@ public class ScriptedVisitorTest {
         StringResult result = new StringResult();
 
         smooks.filterSource(new StringSource(shoppingList), result);
-        assertTrue(StreamUtils.compareCharStreams(
+        assertTrue(compareCharStreams(
                 "<shopping>\n" +
                 "    <category type=\"groceries\"><item>Chocolate</item><item>Coffee</item></category>\n" +
                 "    <category type=\"supplies\"><item>Paper</item><item quantity=\"6\">Pens</item></category>\n" +
