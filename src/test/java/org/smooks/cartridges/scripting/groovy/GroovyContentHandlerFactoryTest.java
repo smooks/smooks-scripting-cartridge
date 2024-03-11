@@ -50,8 +50,8 @@ import org.smooks.engine.lookup.LifecycleManagerLookup;
 import org.smooks.engine.resource.config.DefaultResourceConfig;
 import org.smooks.engine.lifecycle.PostConstructLifecyclePhase;
 import org.smooks.support.StreamUtils;
+import org.smooks.support.XmlUtils;
 import org.smooks.tck.MockApplicationContext;
-import org.smooks.support.XmlUtil;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -92,7 +92,7 @@ public class GroovyContentHandlerFactoryTest {
 		config.setParameter("new-name", "yyy");
 		DOMElementVisitor resource = (DOMElementVisitor) creator.create(config);
 
-		Document doc = XmlUtil.parseStream(new ByteArrayInputStream("<xxx/>".getBytes()), XmlUtil.VALIDATION_TYPE.NONE, false);
+		Document doc = XmlUtils.parseStream(new ByteArrayInputStream("<xxx/>".getBytes()), XmlUtils.VALIDATION_TYPE.NONE, false);
 		assertEquals("xxx", doc.getDocumentElement().getTagName());
 		resource.visitAfter(doc.getDocumentElement(), null);
 		assertEquals("yyy", doc.getDocumentElement().getTagName());
