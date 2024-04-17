@@ -51,7 +51,7 @@ import org.smooks.engine.resource.config.DefaultResourceConfig;
 import org.smooks.engine.lifecycle.PostConstructLifecyclePhase;
 import org.smooks.support.StreamUtils;
 import org.smooks.support.XmlUtils;
-import org.smooks.tck.MockApplicationContext;
+import org.smooks.testkit.MockApplicationContext;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
