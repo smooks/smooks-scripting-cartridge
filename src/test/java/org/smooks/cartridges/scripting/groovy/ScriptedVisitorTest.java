@@ -46,13 +46,13 @@ import org.junit.Test;
 import org.smooks.Smooks;
 import org.smooks.api.ExecutionContext;
 import org.smooks.api.SmooksException;
-import org.smooks.io.payload.JavaResult;
-import org.smooks.io.payload.StringResult;
-import org.smooks.io.payload.StringSource;
+import org.smooks.io.sink.JavaSink;
+import org.smooks.io.sink.StringSink;
+import org.smooks.io.source.StreamSource;
+import org.smooks.io.source.StringSource;
 import org.xml.sax.SAXException;
 import org.xmlunit.builder.DiffBuilder;
 
-import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
 import java.util.Map;
 
@@ -70,30 +70,30 @@ public class ScriptedVisitorTest {
     @Test
     public void test_templated_01() throws IOException, SAXException {
         Smooks smooks = new Smooks(getClass().getResourceAsStream("scripted-01.xml"));
-        StringResult result = new StringResult();
+        StringSink sink = new StringSink();
 
         ExecutionContext execContext = smooks.createExecutionContext();
 
-        smooks.filterSource(execContext, new StringSource("<a><b><c/></b></a>"), result);
-        assertEquals("<a><b><xxx newElementAttribute=\"1234\"/></b></a>", result.getResult());
+        smooks.filterSource(execContext, new StringSource("<a><b><c/></b></a>"), sink);
+        assertEquals("<a><b><xxx newElementAttribute=\"1234\"/></b></a>", sink.getResult());
     }
 
     @Test
     public void test_templated_ext_01() throws IOException, SAXException {
         Smooks smooks = new Smooks(getClass().getResourceAsStream("scripted-ext-01.xml"));
-        StringResult result = new StringResult();
+        StringSink sink = new StringSink();
 
-        smooks.filterSource(new StringSource("<a><b><c/></b></a>"), result);
-        assertEquals("<a><b><xxx newElementAttribute=\"1234\"/></b></a>", result.getResult());
+        smooks.filterSource(new StringSource("<a><b><c/></b></a>"), sink);
+        assertEquals("<a><b><xxx newElementAttribute=\"1234\"/></b></a>", sink.getResult());
     }
 
     @Test
     public void test_templated_02() throws IOException, SAXException {
         Smooks smooks = new Smooks(getClass().getResourceAsStream("scripted-02.xml"));
-        StringResult result = new StringResult();
+        StringSink sink = new StringSink();
 
         try {
-            smooks.filterSource(new StringSource("<a><b><c/></b></a>"), result);
+            smooks.filterSource(new StringSource("<a><b><c/></b></a>"), sink);
             fail("Expected SmooksException.");
         } catch(SmooksException e) {
             assertEquals("Failed to filter source", e.getMessage());
@@ -103,10 +103,10 @@ public class ScriptedVisitorTest {
     @Test
     public void test_templated_ext_02() throws IOException, SAXException {
         Smooks smooks = new Smooks(getClass().getResourceAsStream("scripted-ext-02.xml"));
-        StringResult result = new StringResult();
+        StringSink sink = new StringSink();
 
         try {
-            smooks.filterSource(new StringSource("<a><b><c/></b></a>"), result);
+            smooks.filterSource(new StringSource("<a><b><c/></b></a>"), sink);
             fail("Expected SmooksException.");
         } catch(SmooksException e) {
             assertEquals("Failed to filter source", e.getMessage());
@@ -116,45 +116,45 @@ public class ScriptedVisitorTest {
     @Test
     public void test_templated_03() throws IOException, SAXException {
         Smooks smooks = new Smooks(getClass().getResourceAsStream("scripted-03.xml"));
-        StringResult result = new StringResult();
+        StringSink sink = new StringSink();
 
-        smooks.filterSource(new StringSource("<a><b><c/></b></a>"), result);
-        assertEquals("<a><b><xxx newElementAttribute=\"1234\"></xxx></b></a>", result.getResult());
+        smooks.filterSource(new StringSource("<a><b><c/></b></a>"), sink);
+        assertEquals("<a><b><xxx newElementAttribute=\"1234\"></xxx></b></a>", sink.getResult());
     }
 
     @Test
     public void test_templated_ext_03() throws IOException, SAXException {
         Smooks smooks = new Smooks(getClass().getResourceAsStream("scripted-ext-03.xml"));
-        StringResult result = new StringResult();
+        StringSink sink = new StringSink();
 
-        smooks.filterSource(new StringSource("<a><b><c/></b></a>"), result);
-        assertEquals("<a><b><xxx newElementAttribute=\"1234\"></xxx></b></a>", result.getResult());
+        smooks.filterSource(new StringSource("<a><b><c/></b></a>"), sink);
+        assertEquals("<a><b><xxx newElementAttribute=\"1234\"></xxx></b></a>", sink.getResult());
     }
 
     @Test
     public void test_templated_04() throws IOException, SAXException {
         Smooks smooks = new Smooks(getClass().getResourceAsStream("scripted-04.xml"));
-        StringResult result = new StringResult();
+        StringSink sink = new StringSink();
 
-        smooks.filterSource(new StringSource("<a><b><c/></b></a>"), result);
-        assertEquals("<a><b><c><car make=\"Holden\" name=\"HSV Maloo\" year=\"2006\"><country>Australia</country><record type=\"speed\">Production Pickup Truck with speed of 271kph</record></car><car make=\"Peel\" name=\"P50\" year=\"1962\"><country>Isle of Man</country><record type=\"size\">Smallest Street-Legal Car at 99cm wide and 59 kg in weight</record></car><car make=\"Bugatti\" name=\"Royale\" year=\"1931\"><country>France</country><record type=\"price\">Most Valuable Car at $15 million</record></car></c></b></a>", result.getResult());
+        smooks.filterSource(new StringSource("<a><b><c/></b></a>"), sink);
+        assertEquals("<a><b><c><car make=\"Holden\" name=\"HSV Maloo\" year=\"2006\"><country>Australia</country><record type=\"speed\">Production Pickup Truck with speed of 271kph</record></car><car make=\"Peel\" name=\"P50\" year=\"1962\"><country>Isle of Man</country><record type=\"size\">Smallest Street-Legal Car at 99cm wide and 59 kg in weight</record></car><car make=\"Bugatti\" name=\"Royale\" year=\"1931\"><country>France</country><record type=\"price\">Most Valuable Car at $15 million</record></car></c></b></a>", sink.getResult());
     }
 
     @Test
     public void test_templated_ext_04() throws IOException, SAXException {
         Smooks smooks = new Smooks(getClass().getResourceAsStream("scripted-ext-04.xml"));
-        StringResult result = new StringResult();
+        StringSink sink = new StringSink();
 
-        smooks.filterSource(new StringSource("<a><b><c/></b></a>"), result);
-        assertEquals("<a><b><c><car make=\"Holden\" name=\"HSV Maloo\" year=\"2006\"><country>Australia</country><record type=\"speed\">Production Pickup Truck with speed of 271kph</record></car><car make=\"Peel\" name=\"P50\" year=\"1962\"><country>Isle of Man</country><record type=\"size\">Smallest Street-Legal Car at 99cm wide and 59 kg in weight</record></car><car make=\"Bugatti\" name=\"Royale\" year=\"1931\"><country>France</country><record type=\"price\">Most Valuable Car at $15 million</record></car></c></b></a>", result.getResult());
+        smooks.filterSource(new StringSource("<a><b><c/></b></a>"), sink);
+        assertEquals("<a><b><c><car make=\"Holden\" name=\"HSV Maloo\" year=\"2006\"><country>Australia</country><record type=\"speed\">Production Pickup Truck with speed of 271kph</record></car><car make=\"Peel\" name=\"P50\" year=\"1962\"><country>Isle of Man</country><record type=\"size\">Smallest Street-Legal Car at 99cm wide and 59 kg in weight</record></car><car make=\"Bugatti\" name=\"Royale\" year=\"1931\"><country>France</country><record type=\"price\">Most Valuable Car at $15 million</record></car></c></b></a>", sink.getResult());
     }
 
     @Test
     public void test_templated_05() throws IOException, SAXException {
         Smooks smooks = new Smooks(getClass().getResourceAsStream("scripted-05.xml"));
-        StringResult result = new StringResult();
+        StringSink sink = new StringSink();
 
-        smooks.filterSource(new StringSource(shoppingList), result);
+        smooks.filterSource(new StringSource(shoppingList), sink);
         assertFalse(DiffBuilder.compare("<shopping>\n" +
                 "    <category type=\"groceries\">\n" +
                 "        <item>Luxury Chocolate</item>\n" +
@@ -167,15 +167,15 @@ public class ScriptedVisitorTest {
                 "    <category type=\"present\">\n" +
                 "        \n" +
                 "    <item>Mum's Birthday</item><item when=\"Oct 15\">Monica's Birthday</item></category>\n" +
-                "</shopping>").withTest(result.getResult()).ignoreWhitespace().build().hasDifferences());
+                "</shopping>").withTest(sink.getResult()).ignoreWhitespace().build().hasDifferences());
     }
 
     @Test
     public void test_templated_ext_05() throws IOException, SAXException {
         Smooks smooks = new Smooks(getClass().getResourceAsStream("scripted-ext-05.xml"));
-        StringResult result = new StringResult();
+        StringSink sink = new StringSink();
 
-        smooks.filterSource(new StringSource(shoppingList), result);
+        smooks.filterSource(new StringSource(shoppingList), sink);
         assertFalse(DiffBuilder.compare("<shopping>\n" +
                 "    <category type=\"groceries\">\n" +
                 "        <item>Luxury Chocolate</item>\n" +
@@ -188,41 +188,41 @@ public class ScriptedVisitorTest {
                 "    <category type=\"present\">\n" +
                 "        \n" +
                 "    <item>Mum's Birthday</item><item when=\"Oct 15\">Monica's Birthday</item></category>\n" +
-                "</shopping>").withTest(result.getResult()).ignoreWhitespace().build().hasDifferences());
+                "</shopping>").withTest(sink.getResult()).ignoreWhitespace().build().hasDifferences());
     }
 
     @Test
     public void test_templated_ext_06() throws IOException, SAXException {
         Smooks smooks = new Smooks(getClass().getResourceAsStream("scripted-ext-06.xml"));
-        StringResult result = new StringResult();
+        StringSink sink = new StringSink();
 
-        smooks.filterSource(new StringSource("<a><b><c/></b></a>"), result);
-        assertEquals("<a><b><newElX newElementAttribute=\"1234\"/></b></a>", result.getResult());
+        smooks.filterSource(new StringSource("<a><b><c/></b></a>"), sink);
+        assertEquals("<a><b><newElX newElementAttribute=\"1234\"/></b></a>", sink.getResult());
     }
 
     @Test
     public void test_templated_ext_07() throws IOException, SAXException {
         Smooks smooks = new Smooks(getClass().getResourceAsStream("scripted-ext-07.xml"));
-        StringResult result = new StringResult();
+        StringSink sink = new StringSink();
 
-        smooks.filterSource(new StringSource("<a><b><c/></b></a>"), result);
+        smooks.filterSource(new StringSource("<a><b><c/></b></a>"), sink);
     }
 
     @Test
     public void test_templated_ext_08() throws IOException, SAXException {
         Smooks smooks = new Smooks(getClass().getResourceAsStream("scripted-ext-08.xml"));
-        StringResult result = new StringResult();
+        StringSink sink = new StringSink();
 
-        smooks.filterSource(new StringSource("<a><b><c/></b></a>"), result);
-        assertEquals("<a><b><xxx/></b></a>", result.getResult());
+        smooks.filterSource(new StringSource("<a><b><c/></b></a>"), sink);
+        assertEquals("<a><b><xxx/></b></a>", sink.getResult());
     }
 
     @Test
     public void test_templated_ext_09() throws IOException, SAXException {
         Smooks smooks = new Smooks(getClass().getResourceAsStream("scripted-ext-09.xml"));
-        StringResult result = new StringResult();
+        StringSink sink = new StringSink();
 
-        smooks.filterSource(new StringSource(shoppingList), result);
+        smooks.filterSource(new StringSource(shoppingList), sink);
         assertTrue(compareCharStreams(
                 "<shopping>\n" +
                 "    <category type=\"groceries\">\n" +
@@ -238,31 +238,31 @@ public class ScriptedVisitorTest {
                 "        <item when=\"Oct 15\">Monica's Birthday</item>\n" +
                 "    </category>\n" +
                 "</shopping>",
-                result.getResult()));
+                sink.getResult()));
     }
 
     @Test
     public void test_templated_ext_10() throws IOException, SAXException {
         Smooks smooks = new Smooks(getClass().getResourceAsStream("scripted-ext-10.xml"));
-        StringResult result = new StringResult();
+        StringSink sink = new StringSink();
 
-        smooks.filterSource(new StringSource(shoppingList), result);
+        smooks.filterSource(new StringSource(shoppingList), sink);
         assertTrue(compareCharStreams(
                 "<shopping>\n" +
                 "    <category type=\"groceries\"><item>Chocolate</item><item>Coffee</item></category>\n" +
                 "    <category type=\"supplies\"><item>Paper</item><item quantity=\"6\">Pens</item></category>\n" +
                 "    <category type=\"present\"><item when=\"Aug 10\">Kathryn's Birthday</item></category>\n" +
                 "</shopping>",
-                result.getResult()));
+                sink.getResult()));
     }
 
     @Test
     public void test_templated_ext_11() throws IOException, SAXException {
         Smooks smooks = new Smooks(getClass().getResourceAsStream("scripted-ext-11.xml"));
-        StringResult result = new StringResult();
+        StringSink sink = new StringSink();
 
-        smooks.filterSource(new StringSource(shoppingList), result);
-        assertEquals("<category type=\"supplies\"><item>Paper</item><item quantity=\"6\">Pens</item></category>", result.getResult());
+        smooks.filterSource(new StringSource(shoppingList), sink);
+        assertEquals("<category type=\"supplies\"><item>Paper</item><item quantity=\"6\">Pens</item></category>", sink.getResult());
     }
 
     @Test
@@ -277,10 +277,10 @@ public class ScriptedVisitorTest {
 
     public void test_templated_ext_12_13(String config) throws IOException, SAXException {
         Smooks smooks = new Smooks(getClass().getResourceAsStream(config));
-        JavaResult result = new JavaResult();
+        JavaSink sink = new JavaSink();
 
-        smooks.filterSource(new StreamSource(getClass().getResourceAsStream("order-message.xml")), result);
-        Map orderItems = (Map) result.getBean("orderItems");
+        smooks.filterSource(new StreamSource<>(getClass().getResourceAsStream("order-message.xml")), sink);
+        Map orderItems = (Map) sink.getBean("orderItems");
         Map orderItem;
 
         orderItem = (Map) orderItems.get("111");
