@@ -55,7 +55,7 @@ import org.smooks.engine.memento.SimpleVisitorMemento
 import org.smooks.engine.memento.VisitorMemento
 import org.smooks.engine.resource.visitor.dom.DomModelCreator
 import org.smooks.engine.resource.visitor.dom.DOMModel
-import org.smooks.engine.delivery.dom.serialize.Serializer
+import org.smooks.engine.resource.visitor.dom.Serializer
 import org.smooks.engine.delivery.fragment.NodeFragment
 import org.smooks.support.*
 import org.smooks.io.*
